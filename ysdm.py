@@ -1,3 +1,9 @@
+import sys
+if sys.version_info < (3,0):
+    sys.stdout.write("YSDM requires python3")
+    sys.exit(1)
+
+
 import opml
 import feedparser
 import youtube_dl
@@ -7,7 +13,11 @@ import datetime
 class subscription_download_manager():
     def __init__(self, subscription_manager_file):
         self.file = subscription_manager_file
-        self.parsed = opml.parse(self.file)
+        try:
+            self.parsed = opml.parse(self.file)
+        except:
+            print("Please download \"subscription_manager\" from youtube and place in current directory")
+            sys.exit(1)
         self.channels = self.get_channels()
         self.channels_cached_list = []
 
@@ -54,7 +64,7 @@ class subscription_download_manager():
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", help="subscription manager xml file obtained from youtube", type=str, default='subscription_manager')
+    parser.add_argument("--config", help="subscription manager xml file obtained from youtube", default='subscription_manager')
     parser.add_argument("--since", help="Download videos since (time in seconds) Ex: -s 86400 would download videos from up to one day ago", default=86400, type=float)
     parser.add_argument("--output", help="Directory to download videos. Default: ~/Downloads/", default='~/Downloads')
     args = parser.parse_args()
