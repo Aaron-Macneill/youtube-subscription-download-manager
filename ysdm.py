@@ -24,9 +24,8 @@ class subscription_download_manager():
                 feed = feedparser.parse(c)
                 self.channels_cached_list.append(feed)
 
-    def get_videos(self, check=False, since=None, download=False):
+    def get_videos(self, check=False, since=None, download=False, ydl_opts={}):
         videos = []
-        ydl_opts = {}
         self.populate_channel_cache(check)
         links = self.get_videos_attrs('link')
         if since != None:
@@ -56,7 +55,11 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", help="subscription manager xml file obtained from youtube", type=str, default='subscription_manager')
-    parser.add_argument("--since", help="Download videos since (time in seconds) Ex: -s 86400 would download videos from up to one day ago", default=86400)
+    parser.add_argument("--since", help="Download videos since (time in seconds) Ex: -s 86400 would download videos from up to one day ago", default=86400, type=float)
+    parser.add_argument("--output", help="Directory to download videos. Default: ~/Downloads/", default='~/Downloads')
     args = parser.parse_args()
+    ydl_opts = {
+            'outtmpl': args.output + '/%(title)s.%(ext)s',
+            }
     m = subscription_download_manager(args.config)
-    m.get_videos(since=args.since, download=True)
+    m.get_videos(since=args.since, download=True, ydl_opts=ydl_opts)
